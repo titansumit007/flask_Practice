@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
@@ -59,7 +59,17 @@ def delete_student(student_id):
     mongo.db.students.delete_one({"_id": ObjectId(student_id)})
     return redirect(url_for('index'))
 
+
+# health Check
+# health check
+@app.route('/health')
+def health():
+    try:
+        mongo.cx.admin.command('ping')
+        return jsonify(status="healthy", mongo="connected"), 200
+    except Exception as e:
+        return jsonify(status="unhealthy", error=str(e)), 500
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True, port=5000)
-
 
