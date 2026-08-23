@@ -78,12 +78,12 @@ jobs:
       - name: Verify deployment (health check)
         run: |
           for i in {1..10}; do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:5000/health)
-            if [ "$STATUS" -eq 200 ]; then
+               STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}:5000/health || true)
+            if [ "$STATUS" -eq 200 ] 2>/dev/null; then
               echo "Health check passed"
               exit 0
             fi
-            echo "Attempt $i: not healthy yet, retrying..."
+            echo "Attempt $i: not healthy yet (status=$STATUS), retrying..."
             sleep 6
           done
           echo "Health check failed after retries"
